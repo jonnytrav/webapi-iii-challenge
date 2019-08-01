@@ -18,7 +18,13 @@ router.get("/:id", (req, res) => {
   userDB
     .getById(id)
     .then(user => {
-      res.status(200).json({ success: true, user });
+      if (user) {
+        res.status(200).json({ success: true, user });
+      } else {
+        res
+          .status(404)
+          .json({ success: false, message: "That user does not exist." });
+      }
     })
     .catch(err => {
       res.status(404).json({ success: false, err });
@@ -49,11 +55,46 @@ router.post("/", (req, res) => {
     });
 });
 
-router.post("/:id/posts", (req, res) => {});
+// router.post("/:id/", (req, res) => {
+//  ========= Implemented in the postRouter module =========
+// });
 
-router.put("/:id", (req, res) => {});
+router.put("/:id", (req, res) => {
+  const { id } = req.params;
+  const changes = req.body;
+  userDB
+    .update(id, changes)
+    .then(count => {
+      if (count === 1) {
+        res.status(201).json({ success: true });
+      } else {
+        res
+          .status(404)
+          .json({ success: false, message: "Could not find user to update." });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ success: false, err });
+    });
+});
 
-router.delete("/:id", (req, res) => {});
+router.delete("/:id", (req, res) => {
+  const { id } = req.params;
+  userDB
+    .remove(id)
+    .then(count => {
+      if (count === 1) {
+        res.status(204);
+      } else {
+        res
+          .status(404)
+          .json({ success: false, message: "Cannot find user to remove." });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ success: false, err });
+    });
+});
 
 //custom middleware
 

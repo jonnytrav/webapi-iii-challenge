@@ -33,6 +33,19 @@ router.get("/:id", (req, res) => {
     });
 });
 
+router.post("/", (req, res) => {
+  // ====NOT SURE IF THIS IS GOOD PRACTICE BUT ID IS DECLARED IN THE BODY OF POST REQUEST====
+  postBody = req.body;
+  postsDB
+    .insert(postBody)
+    .then(newPost => {
+      res.status(201).json({ success: true, newPost });
+    })
+    .catch(err => {
+      res.status(500).json({ success: false, err });
+    });
+});
+
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
   postsDB
@@ -54,9 +67,9 @@ router.delete("/:id", (req, res) => {
 
 router.put("/:id", (req, res) => {
   const { id } = req.params;
-  const newData = req.body;
+  const changes = req.body;
   postsDB
-    .update(id, newData)
+    .update(id, changes)
     .then(count => {
       if (count === 1) {
         res.status(201).json({ success: true });
