@@ -43,7 +43,7 @@ router.get("/:id/posts", (req, res) => {
     });
 });
 
-router.post("/", (req, res) => {
+router.post("/", validateUser, (req, res) => {
   const newUser = req.body;
   userDB
     .insert(newUser)
@@ -98,9 +98,31 @@ router.delete("/:id", (req, res) => {
 
 //custom middleware
 
-function validateUserId(req, res, next) {}
+// function validateUserId(req, res, next) {
+//   const { id } = req.params;
+//   if (!id) {
+//     res
+//       .status(404)
+//       .json({ success: false, message: "Please provide a valid ID." });
+//   } else {
+//     next();
+//   }
+// }
 
-function validateUser(req, res, next) {}
+function validateUser(req, res, next) {
+  const body = req.body;
+  if (!body) {
+    res.status(400).json({ success: false, message: "Missing user data." });
+  } else {
+    if (!body.name) {
+      res
+        .status(400)
+        .json({ success: false, message: "Missing required name field." });
+    } else {
+      next();
+    }
+  }
+}
 
 function validatePost(req, res, next) {}
 

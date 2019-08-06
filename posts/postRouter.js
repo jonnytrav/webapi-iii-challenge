@@ -22,8 +22,8 @@ router.get("/:id", validatePostId, (req, res) => {
         res.status(200).json({ success: true, post });
       } else {
         res.status(404).json({
-          success: false,
-          message: "Cannot locate resource. Try a new ID."
+          success: false
+          // message: "Cannot locate resource. Try a new ID."
         });
       }
     })
@@ -33,7 +33,7 @@ router.get("/:id", validatePostId, (req, res) => {
 });
 
 router.post("/", (req, res) => {
-  // ====NOT SURE IF THIS IS GOOD PRACTICE BUT ID IS DECLARED IN THE BODY OF POST REQUEST====
+  // ====NOT SURE IF THIS IS GOOD PRACTICE BUT ID IS DECLARED IN THE BODY OF POST REQUEST IN POSTMAN====
   postBody = req.body;
   postsDB
     .insert(postBody)
@@ -87,6 +87,7 @@ router.put("/:id", validatePostId, (req, res) => {
 
 function validatePostId(req, res, next) {
   const { id } = req.params;
+  // console.log(req);
   if (!id) {
     res.status(404).json({ success: false, message: "Suppy valid ID." });
   } else {
