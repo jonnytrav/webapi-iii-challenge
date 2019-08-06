@@ -1,6 +1,5 @@
 const express = require("express");
 const postsDB = require("./postDb");
-
 const router = express.Router();
 
 router.get("/", (req, res) => {
@@ -14,7 +13,7 @@ router.get("/", (req, res) => {
     });
 });
 
-router.get("/:id", (req, res) => {
+router.get("/:id", validatePostId, (req, res) => {
   const { id } = req.params;
   postsDB
     .getById(id)
@@ -46,7 +45,7 @@ router.post("/", (req, res) => {
     });
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", validatePostId, (req, res) => {
   const { id } = req.params;
   postsDB
     .remove(id)
@@ -65,7 +64,7 @@ router.delete("/:id", (req, res) => {
     });
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", validatePostId, (req, res) => {
   const { id } = req.params;
   const changes = req.body;
   postsDB
@@ -86,6 +85,13 @@ router.put("/:id", (req, res) => {
 
 // custom middleware
 
-function validatePostId(req, res, next) {}
+function validatePostId(req, res, next) {
+  const { id } = req.params;
+  if (!id) {
+    res.status(404).json({ success: false, message: "Suppy valid ID." });
+  } else {
+    next();
+  }
+}
 
 module.exports = router;

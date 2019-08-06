@@ -13,6 +13,10 @@ function logger(req, res, next) {
   next();
 }
 
+// const errHelper = (status, message, res) => {
+//   res.status(status).json({ success: false, err: message });
+// };
+
 server.use(express.json());
 server.use(logger);
 server.use("/api/users", userRoute);
