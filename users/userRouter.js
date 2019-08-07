@@ -31,7 +31,7 @@ router.get("/:id", (req, res) => {
     });
 });
 
-router.get("/:id/posts", (req, res) => {
+router.get("/:id/posts", validateUserId, (req, res) => {
   const { id } = req.params;
   userDB
     .getUserPosts(id)
@@ -59,7 +59,7 @@ router.post("/", validateUser, (req, res) => {
 //  ========= Implemented in the postRouter module =========
 // });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", validateUserId, (req, res) => {
   const { id } = req.params;
   const changes = req.body;
   userDB
@@ -92,22 +92,25 @@ router.delete("/:id", (req, res) => {
       }
     })
     .catch(err => {
-      res.status(500).json({ success: false, err });
+      res.status(400).json({ success: false, err });
     });
 });
 
 //custom middleware
 
-// function validateUserId(req, res, next) {
-//   const { id } = req.params;
-//   if (!id) {
-//     res
-//       .status(404)
-//       .json({ success: false, message: "Please provide a valid ID." });
-//   } else {
-//     next();
-//   }
-// }
+function validateUserId(req, res, next) {
+  const { id } = req.params;
+  userDB.getById(id).then(response => {
+    if (!response) {
+      res.status(400).json({
+        success: false,
+        message: "A user with that ID does not exist."
+      });
+    } else {
+      next();
+    }
+  });
+}
 
 function validateUser(req, res, next) {
   const body = req.body;
@@ -123,7 +126,5 @@ function validateUser(req, res, next) {
     }
   }
 }
-
-function validatePost(req, res, next) {}
 
 module.exports = router;

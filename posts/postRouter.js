@@ -13,7 +13,7 @@ router.get("/", (req, res) => {
     });
 });
 
-router.get("/:id", validatePostId, (req, res) => {
+router.get("/:id", (req, res) => {
   const { id } = req.params;
   postsDB
     .getById(id)
@@ -32,7 +32,7 @@ router.get("/:id", validatePostId, (req, res) => {
     });
 });
 
-router.post("/", (req, res) => {
+router.post("/", validatePost, (req, res) => {
   // ====NOT SURE IF THIS IS GOOD PRACTICE BUT ID IS DECLARED IN THE BODY OF POST REQUEST IN POSTMAN====
   postBody = req.body;
   postsDB
@@ -88,10 +88,26 @@ router.put("/:id", validatePostId, (req, res) => {
 function validatePostId(req, res, next) {
   const { id } = req.params;
   // console.log(req);
-  if (!id) {
-    res.status(404).json({ success: false, message: "Suppy valid ID." });
+  postsDB.getById(id).then(response => {
+    if (!response) {
+      res.status(400).json({ success: false, message: "Id invalid." });
+    } else {
+      next();
+    }
+  });
+}
+
+function validatePost(req, res, next) {
+  //THIS ONLY CHECKS THE TEXT FIELD, NOT THE USER ID
+  const body = req.body;
+  if (!body) {
+    res.status(400).json({ success: false, message: "Missing post data." });
   } else {
-    next();
+    if (!body.text) {
+      res
+        .status(400)
+        .json({ success: false, message: "Missing required text input." });
+    }
   }
 }
 
